@@ -5,7 +5,8 @@
 %
 % This file is part of the package written
 % For the course AE4ASM003 Linear Modeling (incl. F.E.M)
-% Please do no not copy.
+% Please do no not copy if you are following the course.
+% Otherwise feel free to use it.
 %=========================================
 %
 %StudentIDtoParameters This function turns your student ID into the
