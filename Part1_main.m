@@ -17,12 +17,14 @@ clear; close all; clc;
 % Input student number
 studentID = 4146557;
 
-% Generate parameters A-Z
-AZparams = studentIDtoParameters(studentID);
+% Generate parameters A-G
+AGparams = studentIDtoParameters(studentID);
 
-% Using AZparams create the values for the assignment
-values = Part1_obtainAssignmentValues(AZparams);
+% Using AGparams create the values for the assignment
+values = Part1_obtainAssignmentValues(AGparams);
 
 % Using the values reated above, draw the geometry and check for
 % consistency.
 figHandle = Part1_createGeometry(values);
+
+%% Actual assignment start
