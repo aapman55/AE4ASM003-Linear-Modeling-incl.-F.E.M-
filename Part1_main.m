@@ -15,7 +15,7 @@
 clear; close all; clc;
 
 % Input student number
-studentID = 4146557;
+studentID = 4106849;
 
 % Generate parameters A-G
 AGparams = studentIDtoParameters(studentID);
@@ -28,3 +28,8 @@ values = Part1_obtainAssignmentValues(AGparams);
 figHandle = Part1_createGeometry(values);
 
 %% Actual assignment start
+calcWidth = @(x) values.W1 - (values.W1-values.W2)*x/values.L3;
+
+A1 = (calcWidth(0)+calcWidth(values.L1))/2 * values.t
+A2 = (calcWidth(values.L1)+calcWidth(values.L1+values.L2))/2 * values.t
+A3 = (calcWidth(values.L1+values.L2)+calcWidth(values.L3))/2 * values.t
