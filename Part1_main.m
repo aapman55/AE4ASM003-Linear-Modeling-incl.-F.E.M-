@@ -15,7 +15,8 @@
 clear; close all; clc;
 
 % Input student number
-studentID = 4106849;
+% studentID = 4106849;
+studentID = 4146557;
 
 % Generate parameters A-G
 AGparams = studentIDtoParameters(studentID);
@@ -34,17 +35,17 @@ calcWidth = @(x) values.W1 - (values.W1-values.W2)*x/values.L3 - calcCavityWidth
 % Define L4 as L3-L1-L2
 L4 = values.L3 - values.L1 - values.L2;
 
-A1 = calcWidth(values.L1/2)*values.t
-A2 = calcWidth(values.L1+values.L2/2)*values.t
-A3 = calcWidth(values.L3-L4/2) * values.t
+A1 = calcWidth(values.L1/2)*values.t;
+A2 = calcWidth(values.L1+values.L2/2)*values.t;
+A3 = calcWidth(values.L3-L4/2) * values.t;
 
-k1 = [1, -1; -1 ,1]*values.E*A1/values.L1
-k2 = [1, -1; -1 ,1]*values.E*A2/values.L2
-k3 = [1, -1; -1 ,1]*values.E*A3/L4
+k1 = [1, -1; -1 ,1]*values.E*A1/values.L1;
+k2 = [1, -1; -1 ,1]*values.E*A2/values.L2;
+k3 = [1, -1; -1 ,1]*values.E*A3/L4;
 
 
 
-k_global = zeros(4,4)
+k_global = zeros(4,4);
 k_global(1:2,1:2) = k_global(1:2,1:2) + k1;
 k_global(2:3,2:3) = k_global(2:3,2:3) + k2;
 k_global(3:4,3:4) = k_global(3:4,3:4) + k3;
@@ -52,3 +53,11 @@ k_global(3:4,3:4) = k_global(3:4,3:4) + k3;
 P = [0;0;0;values.P];
 
 u = k_global(2:end,2:end)\P(2:end)
+
+%%
+% REconstruct original u vector
+u = [0;u];
+u = u(2:end)-u(1:end-1);
+strain = u./[values.L1; values.L2; L4]
+
+stress = values.E*strain
