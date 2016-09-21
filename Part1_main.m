@@ -28,8 +28,12 @@ values = Part1_obtainAssignmentValues(AGparams);
 figHandle = Part1_createGeometry(values);
 
 %% Actual assignment start
-calcWidth = @(x) values.W1 - (values.W1-values.W2)*x/values.L3;
+calcCavityWidth = @(x) double((x>= values.L1 && x<=(values.L1+values.L2)))*values.W3;
+calcWidth = @(x) values.W1 - (values.W1-values.W2)*x/values.L3 - calcCavityWidth(x);
 
-A1 = (calcWidth(0)+calcWidth(values.L1))/2 * values.t
-A2 = (calcWidth(values.L1)+calcWidth(values.L1+values.L2))/2 * values.t
-A3 = (calcWidth(values.L1+values.L2)+calcWidth(values.L3))/2 * values.t
+% Define L4 as L3-L1-L2
+L4 = values.L3 - values.L1 - values.L2;
+
+A1 = calcWidth(values.L1/2)*values.t
+A2 = calcWidth(values.L1+values.L2/2)*values.t
+A3 = calcWidth(values.L3-L4/2) * values.t
