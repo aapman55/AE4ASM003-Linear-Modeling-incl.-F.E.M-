@@ -117,8 +117,8 @@ A.u = A.T\u(1:4);
 B.u = B.T\u(3:6);
 
 % Strain
-A.strainX = (A.u(3)+A.u(1))/A.length;
-B.strainX = (B.u(3)+B.u(1))/B.length;
+A.strainX = (A.u(3)-A.u(1))/A.length;
+B.strainX = (B.u(1)-B.u(3))/B.length;
 
 % Stress
 A.stressX = A.E*A.strainX;

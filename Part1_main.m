@@ -55,9 +55,9 @@ P = [0;0;0;values.P];
 u = k_global(2:end,2:end)\P(2:end)
 
 %%
-% REconstruct original u vector
+% Reconstruct original u vector
 u = [0;u];
-u = u(2:end)-u(1:end-1);
-strain = u./[values.L1; values.L2; L4]
+uPerElement = u(2:end)-u(1:end-1);
+strain = uPerElement./[values.L1; values.L2; L4]
 
 stress = values.E*strain
