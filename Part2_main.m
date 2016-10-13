@@ -106,7 +106,15 @@ U(keepIndices) = Ucalculated;
 
 % Plot vertical displacements
 vIndices = (1:nElements+1)*3-1;
+uIndices = vIndices - 1;
 xLocations = linspace(0,values.L,nElements+1);
 
 hold on
 plot(xLocations, U(vIndices))
+
+%% Post processing
+% Calculate the strains
+% First calculate the delta u per element
+uPerElement = U(uIndices(2:length(uIndices))) - U(uIndices(1:length(uIndices)-1));
+strainPerElement = uPerElement/(values.L/nElements);
+stressPerElement = strainPerElement*values.E;
