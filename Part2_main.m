@@ -34,7 +34,7 @@ AGparams = studentIDtoParameters(studentID);
 values = Part2_obtainAssignmentValues(AGparams);
 
 % Amount of elements (should be an even number)
-nElements = 64;
+nElements = 4;
 
 %% Functions
 % Area moment of inertia around x-axis

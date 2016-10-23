@@ -39,10 +39,11 @@ A1 = calcWidth(values.L1/2)*values.t;
 A2 = calcWidth(values.L1+values.L2/2)*values.t;
 A3 = calcWidth(values.L3-L4/2) * values.t;
 
-k1 = [1, -1; -1 ,1]*values.E*A1/values.L1;
-k2 = [1, -1; -1 ,1]*values.E*A2/values.L2;
-k3 = [1, -1; -1 ,1]*values.E*A3/L4;
+createLocalK = @(E, A, L) [1, -1; -1 ,1]*E*A/L;
 
+k1 = createLocalK(values.E, A1, values.L1);
+k2 = createLocalK(values.E, A2, values.L2);
+k3 = createLocalK(values.E, A3, L4);
 
 
 k_global = zeros(4,4);
