@@ -49,9 +49,15 @@ K = @(E, I, A, l) [   12*E*I/l^3, 6*E*I/l^2,        -12*E*I/l^3   , 6*E*I/l^2;
 v = @(x, L, E, I, P) -P.*x./(48.*E.*I).*(3.*L.^2-4.*x.^2);
 vmax = @(L, E, I, P) P*L^3/(48*E*I);
 
+% Begin loop
+inputElements=[2,4,8,16,32,64];
+UPointOfInterest= zeros(size(inputElements));
+counter = 1;
+PointOfInterest = 0.44*values.L;
+for inputElementsLooper=inputElements
 %% Preprocessing
 % Amount of elements (should be an even number)
-nElements = 20;
+nElements = inputElementsLooper;
 
 Ixx = InertiaX(values.C1, values.C2, values.t);
 DOFPerElement = 2;
@@ -110,3 +116,13 @@ xLocations = linspace(0,values.L,nElements+1);
 
 hold on
 plot(xLocations, U(vIndices))
+
+UPointOfInterest(counter) = interp1(xLocations,U(vIndices),PointOfInterest);
+counter = counter + 1;
+end
+
+%% Plot Results
+figure(); 
+plot(inputElements,UPointOfInterest);
+hold on
+plot(inputElements,ones(size(inputElements))*v(PointOfInterest, values.L, values.E, Ixx, values.P));
