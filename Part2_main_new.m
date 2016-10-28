@@ -24,8 +24,8 @@
 clear; close all; clc;
 
 % Input student number
-studentID = 4106849;
-% studentID = 4146557;
+% studentID = 4106849;
+studentID = 4146557;
 
 % Generate parameters A-G
 AGparams = studentIDtoParameters(studentID);
@@ -34,19 +34,17 @@ AGparams = studentIDtoParameters(studentID);
 values = Part2_obtainAssignmentValues(AGparams);
 
 % Amount of elements (should be an even number)
-nElements = 4;
+nElements = 20;
 
 %% Functions
 % Area moment of inertia around x-axis
 InertiaX = @(C1, C2, t) 2*(C2*t^3/12+C2*t*(C1/2-t/2)^2) + t*C1^3/12;
 
 % local stiffness matrix for a frame
-K = @(E, I, A, l) [E*A/l,   0,                  0,  -E*A/l,     0,          0;
-                       0,   12*E*I/l^3, 6*E*I/l^2,        0, -12*E*I/l^3   , 6*E*I/l^2;
-                       0,   6*E*I/l^2,  4*E*I/l,          0,    -6*E*I/l^2, 2*E*I/l;
-                       -E*A/l,      0,      0,      E*A/l,      0,      0;
-                       0,   -12*E*I/l^3,    -6*E*I/l^2, 0,      12*E*I/l^3, -6*E*I/l^2;
-                       0,   6*E*I/l^2,      2*E*I/l,        0,  -6*E*I/l^2, 4*E*I/l];
+K = @(E, I, A, l) [   12*E*I/l^3, 6*E*I/l^2,        -12*E*I/l^3   , 6*E*I/l^2;
+                       6*E*I/l^2,  4*E*I/l,             -6*E*I/l^2, 2*E*I/l;                       
+                       -12*E*I/l^3,    -6*E*I/l^2,      12*E*I/l^3, -6*E*I/l^2;
+                        6*E*I/l^2,      2*E*I/l,     -6*E*I/l^2, 4*E*I/l];
 
 % Analystical solution
 % http://classes.mst.edu/civeng110/formulas/formula_sheet.pdf
@@ -56,7 +54,7 @@ vmax = @(L, E, I, P) P*L^3/(48*E*I);
 
 %% Preprocessing
 Ixx = InertiaX(values.C1, values.C2, values.t);
-DOFPerElement = 3;
+DOFPerElement = 2;
 DOF = (nElements+1)*DOFPerElement;
 
 %% Analystical solution
@@ -80,18 +78,18 @@ for i=0:nElements-1
 end
 
 % Apply boundary conditions and initial conditions
-% u11 = U(1) = 0, u12 = U(2) = 0, u32 = U(end-1)= 0, f22 = F(end/2+1) = -P
+% u11 = U(1) = 0,  u32 = U(end-1)= 0, f21 = F(end/2) = -P
 
 F = zeros(DOF,1);
 % The problem is set up such that the load P will always be in the middle
-F(median(1:DOF)) = -values.P;
+F(end/2) = -values.P;
 
 U = zeros(DOF,1);
 
 % Determine which indices to keep
-% Remove the horizontal and vertical movement of the first node and remove
+% Remove the vertical movement of the first node and remove
 % the vertical movement of the last node
-removeIndices = [1,2,DOF-1];
+removeIndices = [1,DOF-1];
 
 % Get the indices to keep by removing the removeIndices from all indices
 keepIndices = setdiff(1:length(U),removeIndices);
@@ -106,7 +104,7 @@ Ucalculated = kForCalculation\FforCalculation;
 U(keepIndices) = Ucalculated;
 
 % Plot vertical displacements
-vIndices = (1:nElements+1)*3-1;
+vIndices = (1:nElements+1)*DOFPerElement-1;
 uIndices = vIndices - 1;
 xLocations = linspace(0,values.L,nElements+1);
 
@@ -116,6 +114,11 @@ plot(xLocations, U(vIndices))
 %% Post processing
 % Calculate the strains
 % First calculate the delta u per element
-uPerElement = U(uIndices(2:length(uIndices))) - U(uIndices(1:length(uIndices)-1));
-strainPerElement = uPerElement/(values.L/nElements);
-stressPerElement = strainPerElement*values.E;
+B = @(x1, x2, l)  [-6/l^2+12*x1/l^3, -4/l + 6*x1/l^2, 6/l^2-12*x2/l^3, -2/l+6*x2/l^2] ;
+strain = zeros(nElements,1);
+
+for i = 1:nElements
+    strain(i) = -values.C1*B(xLocations(i),xLocations(i+1),values.L/nElements)*U(1+DOFPerElement*(i-1):1+DOFPerElement*(i-1)+2*DOFPerElement-1);
+end
+
+stress = strain*values.E;
