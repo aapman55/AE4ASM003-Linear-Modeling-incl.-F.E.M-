@@ -50,6 +50,7 @@ K = @(E, I, A, l) [   12*E*I/l^3, 6*E*I/l^2,        -12*E*I/l^3   , 6*E*I/l^2;
 % http://classes.mst.edu/civeng110/formulas/formula_sheet.pdf
 % Only for 0<=x<=L/2
 v = @(x, L, E, I, P) -P.*x./(48.*E.*I).*(3.*L.^2-4.*x.^2);
+thetaStart = @(L, E, I, P) P*L^2/(16*E*I);
 vmax = @(L, E, I, P) P*L^3/(48*E*I);
 
 %% Preprocessing
@@ -63,6 +64,7 @@ displacement = v(0:values.L/2, values.L, values.E, Ixx, values.P);
 displacement = [displacement, flip(displacement(1:end-1))];
 plot(0:values.L, displacement)
 maxDisplacement = vmax(values.L, values.E, Ixx, values.P);
+thetaStart(values.L, values.E, Ixx, values.P)
 
 %% Numerical solution
 
