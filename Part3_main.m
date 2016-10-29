@@ -55,7 +55,7 @@ nodeX = [   -values.W1/2;                               % First row start
             values.W3/2;
             values.W2/2;];
         
-nodeY = [   0;
+nodeY = -[   0;
             0;
             0;
             0;
@@ -73,7 +73,7 @@ nodeY = [   0;
             values.L3;];
         
  hold on
- scatter(nodeX,700-nodeY,'k')
+ scatter(nodeX,700+nodeY,'k')
  
  % Assign elements (8) with nodes(16)
  nodesForElements = [1, 2, 5, 6;
@@ -103,3 +103,56 @@ for i=1:8
                                                                     values.nu);
 end
 
+% Assemble global matrix from local matrices
+K_global = zeros(32,32);
+% Create lookup Matrix with entries [1, 1, 2, 2, 3, 3 ......
+lookUp = repmat(repelem(1:16,2),32,1);
+
+for i=1:8
+    % Lookup matrix for local stiffness
+    lookUpLocal = repmat(repelem(nodesForElements(i,[3,4,2,1]),2),8,1);
+    
+    % Retrieve entries in global k matrix
+    for j = nodesForElements(i,[3, 4, 2, 1])        % order i j m n
+        for k = nodesForElements(i,[3, 4, 2, 1])
+            entries = logical((lookUp' == j) .* (lookUp == k));
+            entriesLocal = logical((lookUpLocal' == j) .* (lookUpLocal == k));
+            K_global(entries) = K_global(entries) + K_locals(entriesLocal);
+        end
+    end
+    
+    disp('hallo')
+end
+
+% Construct U vector
+U = zeros(32,1);
+
+% Construct P vector
+P = zeros(32,1);
+
+% Apply loads. It is assumed that the load is evenly distributed over the
+% bottom 4 nodes.
+P([26,28,30,32]) = [-values.P/6, -values.P/3,-values.P/3,-values.P/6,];
+
+% Determine which nodes to remove
+% The top side is encastred so the u and v of the first 4 nodes are not
+% needed. So remove the first 8 entries
+keepindices = 9:32;
+
+% Get the vector P and matrix K_global ready by removing corresponding row
+% and columns
+K_global_forCalculation = K_global(keepindices,keepindices);
+P_forCalculation = P(keepindices);
+
+U_calculated = K_global_forCalculation\P_forCalculation;
+
+% Put the U_calculated back into the U vector
+U(keepindices) = U_calculated;
+
+%% Show deformed shape
+exaggerationFactor = 5000;
+newX = nodeX + exaggerationFactor*U(1:2:31);
+newY = nodeY + exaggerationFactor*U(2:2:32);
+scatter(newX,newY,'k')
+hold on
+scatter(nodeX, nodeY, 'b')
