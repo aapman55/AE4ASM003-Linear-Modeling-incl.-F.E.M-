@@ -100,7 +100,8 @@ for i=1:8
                                                                     nodeX(nodesForElements(i,1)),...n
                                                                     nodeY(nodesForElements(i,1)),...
                                                                     values.E,...
-                                                                    values.nu);
+                                                                    values.nu,...
+                                                                    values.t);
 end
 
 % Assemble global matrix from local matrices
@@ -120,8 +121,6 @@ for i=1:8
             K_global(entries) = K_global(entries) + K_locals(entriesLocal);
         end
     end
-    
-    disp('hallo')
 end
 
 % Construct U vector
@@ -132,7 +131,8 @@ P = zeros(32,1);
 
 % Apply loads. It is assumed that the load is evenly distributed over the
 % bottom 4 nodes.
-P([26,28,30,32]) = [-values.P/6, -values.P/3,-values.P/3,-values.P/6,];
+P([26,28,30,32]) = [-values.P/6, -values.P/3,-values.P/3,-values.P/6];
+% P([26,28,30,32]) = [0, -values.P/2,-values.P/2,0];
 
 % Determine which nodes to remove
 % The top side is encastred so the u and v of the first 4 nodes are not
@@ -153,6 +153,7 @@ U(keepindices) = U_calculated;
 exaggerationFactor = 5000;
 newX = nodeX + exaggerationFactor*U(1:2:31);
 newY = nodeY + exaggerationFactor*U(2:2:32);
+figure()
 scatter(newX,newY,'k')
 hold on
 scatter(nodeX, nodeY, 'b')

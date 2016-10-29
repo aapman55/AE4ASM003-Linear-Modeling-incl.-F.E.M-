@@ -1,4 +1,4 @@
-function K = Part3_createSingleElementStiffnessMatrix(xi, yi, xj, yj, xm, ym, xn, yn, E, nu)
+function K = Part3_createSingleElementStiffnessMatrix(xi, yi, xj, yj, xm, ym, xn, yn, E, nu, t)
 % The symbols r and s are the axes of the natural coordinate system. They
 % are defined as symbols here because an integration needs to be done over
 % r and s.
@@ -26,6 +26,6 @@ D = E/(1-nu^2)*[    1,      nu,     0;
                 
 INT = transpose(B)*D*B*det(J);
 
-K = int(int(INT,r,-1,1),s,-1,1);
+K = t*int(int(INT,r,-1,1),s,-1,1);
 
 end
