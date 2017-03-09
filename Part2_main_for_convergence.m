@@ -120,9 +120,15 @@ plot(xLocations, U(vIndices))
 UPointOfInterest(counter) = interp1(xLocations,U(vIndices),PointOfInterest);
 counter = counter + 1;
 end
-
+xlabel('Beam leangth [mm]')
+ylabel('vertical displacement [mm]');
+grid minor
 %% Plot Results
 figure(); 
 plot(inputElements,UPointOfInterest);
 hold on
 plot(inputElements,ones(size(inputElements))*v(PointOfInterest, values.L, values.E, Ixx, values.P));
+xlabel('Number of elements [-]');
+ylabel('Vertical Displacement at 0.44L [mm]');
+legend('Numerical solution','Analytical solution')
+grid minor

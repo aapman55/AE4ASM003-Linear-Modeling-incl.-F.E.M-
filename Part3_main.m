@@ -26,7 +26,7 @@ values = Part1_obtainAssignmentValues(AGparams);
 
 % Using the values reated above, draw the geometry and check for
 % consistency.
-figHandle = Part1_createGeometry(values);
+figHandle = Part3_createGeometry(values);
 
 %% The width of the element at location y (outer)
 calcWidth = @(y) values.W1 - (values.W1-values.W2)*y/values.L3;
@@ -34,7 +34,7 @@ calcWidth = @(y) values.W1 - (values.W1-values.W2)*y/values.L3;
 % Define L4 as L3-L1-L2
 L4 = values.L3 - values.L1 - values.L2;
 %% Actual assignment start
-% The problem is divided into 9 elements and 16 nodes
+% The problem is divided into 8 elements and 16 nodes
 % First determine the coordinates of the nodes. The axis is put in the
 % symmetry line of the structure and on top.
 
@@ -73,7 +73,7 @@ nodeY = -[   0;
             values.L3;];
         
  hold on
- scatter(nodeX,700+nodeY,'k')
+ scatter(nodeX,nodeY,'k')
  
  % Assign elements (8) with nodes(16)
  nodesForElements = [1, 2, 5, 6;
@@ -123,7 +123,7 @@ for i=1:8
     end
 end
 
-% Construct U vector
+%% Construct U vector
 U = zeros(32,1);
 
 % Construct P vector
@@ -131,8 +131,7 @@ P = zeros(32,1);
 
 % Apply loads. It is assumed that the load is evenly distributed over the
 % bottom 4 nodes.
-P([26,28,30,32]) = [-values.P/6, -values.P/3,-values.P/3,-values.P/6];
-% P([26,28,30,32]) = [0, -values.P/2,-values.P/2,0];
+P([28,30]) = [-values.P/2,-values.P/2];
 
 % Determine which nodes to remove
 % The top side is encastred so the u and v of the first 4 nodes are not
@@ -154,6 +153,37 @@ exaggerationFactor = 5000;
 newX = nodeX + exaggerationFactor*U(1:2:31);
 newY = nodeY + exaggerationFactor*U(2:2:32);
 figure()
-scatter(newX,newY,'k')
+Part3_createGeometry(values);
 hold on
+scatter(newX,newY,'k')
 scatter(nodeX, nodeY, 'b')
+
+%% Post-processing
+% The strain can be obtained from Bu
+% The stress can be obtained from D epsilon
+% The stress and strains are assumed to be at the centre of the element =>
+% r=s=0. This is built into the function Part3_calculateStrainStressMatrices
+strain = zeros(3,8);
+stress = zeros(3,8);
+for i=1:8
+    [B,D] =   Part3_calculateStrainStressMatrices(        nodeX(nodesForElements(i,3)),...i
+                                                                    nodeY(nodesForElements(i,3)),...
+                                                                    nodeX(nodesForElements(i,4)),...j
+                                                                    nodeY(nodesForElements(i,4)),...
+                                                                    nodeX(nodesForElements(i,2)),...m
+                                                                    nodeY(nodesForElements(i,2)),...
+                                                                    nodeX(nodesForElements(i,1)),...n
+                                                                    nodeY(nodesForElements(i,1)),...
+                                                                    values.E,...
+                                                                    values.nu);
+     strain(:,i) = B*U(  [nodesForElements(i,3)*2-1,...i
+                    nodesForElements(i,3)*2,...
+                    nodesForElements(i,4)*2-1,...j
+                    nodesForElements(i,4)*2,...
+                    nodesForElements(i,2)*2-1,...m
+                    nodesForElements(i,2)*2,...
+                    nodesForElements(i,1)*2-1,...n
+                    nodesForElements(i,1)*2]);
+     stress(:,i) = D*strain(:,i);
+end
+

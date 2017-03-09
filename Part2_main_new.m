@@ -120,7 +120,8 @@ B = @(x1, x2, l)  [-6/l^2+12*x1/l^3, -4/l + 6*x1/l^2, 6/l^2-12*x2/l^3, -2/l+6*x2
 strain = zeros(nElements,1);
 
 for i = 1:nElements
-    strain(i) = -values.C1*B(xLocations(i),xLocations(i+1),values.L/nElements)*U(1+DOFPerElement*(i-1):1+DOFPerElement*(i-1)+2*DOFPerElement-1);
+    avgX = (xLocations(i+1)+xLocations(i))/2;
+    strain(i) = -values.C1/2*B(avgX,avgX,values.L/nElements)*U(1+DOFPerElement*(i-1):1+DOFPerElement*(i-1)+2*DOFPerElement-1);
 end
 
 stress = strain*values.E;

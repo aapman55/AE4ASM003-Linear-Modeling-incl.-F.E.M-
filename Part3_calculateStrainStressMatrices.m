@@ -1,4 +1,4 @@
-function K = Part3_createSingleElementStiffnessMatrix(xi, yi, xj, yj, xm, ym, xn, yn, E, nu, t)
+function [B_out, D] = Part3_calculateStrainStressMatrices(xi, yi, xj, yj, xm, ym, xn, yn, E, nu)
 % The symbols r and s are the axes of the natural coordinate system. They
 % are defined as symbols here because an integration needs to be done over
 % r and s.
@@ -21,15 +21,12 @@ m = 1/4*[   -(1-s),    0,  (1-s),   0,  (1+s),  0,  -(1+s), 0;
 % B is just a definition        
 B = A*m;
 
+B_out = subs(B,[r,s],[0,0]);
+
 % The compliance matrix for isotropic materials
 D = E/(1-nu^2)*[    1,      nu,     0;
                     nu,     1,      0;
                     0,      0,  (1-nu)/2];
 
-% The iside of the strain integral to be solved
-INT = transpose(B)*D*B*det(J);
-
-% Actually solving the integral
-K = t*int(int(INT,r,-1,1),s,-1,1);
 
 end
